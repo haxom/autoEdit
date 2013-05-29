@@ -66,13 +66,15 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 				enableCheckBox = new JCheckBox("disabled", isActive);
 				enableCheckBox.setActionCommand("changestate");
 				enableCheckBox.addActionListener(BurpExtender.this);
-
 				urlTextField = new JTextField(40);
 				urlTextField.setText("https?://www.google.fr/");
-
 				northPanel.add(enableCheckBox);
-				northPanel.add(new JLabel(" |  Url (regex)  "));
+				northPanel.add(new JLabel(" |  url (regex)  "));
 				northPanel.add(urlTextField);
+				JButton clearLogButton = new JButton("clear logs");
+				clearLogButton.setActionCommand("clear_log");
+				clearLogButton.addActionListener(BurpExtender.this);
+				northPanel.add(clearLogButton);
 				mainPanel.add(northPanel, BorderLayout.NORTH);
 
 				// East
@@ -183,7 +185,11 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 				enableCheckBox.setSelected(true);
 				enableCheckBox.setText("enabled");
 			}
-		}	
+		}
+		if(e.getActionCommand().equals("clear_log"))
+		{
+			logTextArea.setText("");
+		}
 	}
 
 	@Override
