@@ -111,7 +111,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 					"url_encode",
 					"url_decode",
 					"double_url_encode",
-					"double_url_decode"
+					"double_url_decode",
+					"strange"
 				};
 				methodBox = new JComboBox(methods);
 				methodBox.setSelectedIndex(0);
@@ -243,6 +244,14 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 			return helpers.urlEncode(helpers.urlEncode(value));
 		else if(methodS.equals("double_url_decode"))
 			return helpers.urlDecode(helpers.urlDecode(value));
+		else if(methodS.equals("strange"))
+		{
+			String result = "";
+			for(int i=0;i<value.length();i++)
+				result = result + ((int)value.charAt(i)+64);
+			result = helpers.base64Encode(result.getBytes());
+			return result;
+		}
 		else
 			return value;
 	}
