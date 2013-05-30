@@ -248,7 +248,16 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 		{
 			String result = "";
 			for(int i=0;i<value.length();i++)
-				result = result + ((int)value.charAt(i)+64);
+			{
+				int cur = (int)value.charAt(i);
+				cur ^= 192;
+				if(cur < 10)
+					result = result + "00" + cur;
+				else if(cur < 100)
+					result = result + "0" + cur;
+				else
+					result = result + cur;
+			}
 			result = helpers.base64Encode(result.getBytes());
 			return result;
 		}
