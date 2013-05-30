@@ -245,8 +245,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 		else if(methodS.equals("double_url_decode"))
 			return helpers.urlDecode(helpers.urlDecode(value));
 		else if(methodS.equals("strange"))
-		{
 			String result = "";
+			value = helpers.urlDecode(helpers.urlDecode(value));
 			for(int i=0;i<value.length();i++)
 			{
 				int cur = (int)value.charAt(i);
