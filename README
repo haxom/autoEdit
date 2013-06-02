@@ -8,6 +8,10 @@ Supported methods :
 - base64 decode
 - url (double) encode
 - url (double) decode
+- strange (just for a challenge ;])
+- serialize_php
+	form expected : param=name1=value1;name2=value2;...
+	-> param=base64_encode(a:2:{s:5:"name1";s:6:"value1";s:5:"name2";s:6:"value2";})
 
 -- Burp Extender API (all Java files, except BurpExtender.java) :  <http://portswigger.net/burp/extender/api/burp_extender_api.zip>
 -- JavaDoc for Bur Extender API : <http://portswigger.net/burp/extender/api/index.html>
@@ -18,11 +22,12 @@ ToDo
 Adding methods :
 - md5
 - sha1
-- XOR (with user-defined key)
+- XOR
 
 Features :
 - multi-methods selection
 - user-defined methods
+- method / param
 
 Compilation
 ===========

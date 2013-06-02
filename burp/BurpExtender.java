@@ -112,7 +112,9 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 					"url_decode",
 					"double_url_encode",
 					"double_url_decode",
-					"strange"
+					"strange",
+					"serialize_php"
+
 				};
 				methodBox = new JComboBox(methods);
 				methodBox.setSelectedIndex(0);
@@ -245,8 +247,9 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 		else if(methodS.equals("double_url_decode"))
 			return helpers.urlDecode(helpers.urlDecode(value));
 		else if(methodS.equals("strange"))
+		{
 			String result = "";
-			value = helpers.urlDecode(helpers.urlDecode(value));
+			value = helpers.urlDecode(new String(value.getBytes()));
 			for(int i=0;i<value.length();i++)
 			{
 				int cur = (int)value.charAt(i);
@@ -260,6 +263,22 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 			}
 			result = helpers.base64Encode(result.getBytes());
 			return result;
+		}
+		else if(methodS.equals("serialize_php"))
+		{
+			// format attempted login=name1=param1;name2=param2
+			String enums[] = value.split(";");
+			String retour = "a:"+(enums.length)+":{";
+			for(int i=0;i<enums.length;i++)
+			{
+				String name = enums[i].split("=")[0];
+				String val = enums[i].split("=")[1];
+				retour = retour +"s:"+name.length()+":\""+name+"\";s:"+val.length()+":\""+val+"\";";
+
+			}
+			retour = retour +"}";
+
+			return (new String(helpers.base64Encode(retour.getBytes())));
 		}
 		else
 			return value;
