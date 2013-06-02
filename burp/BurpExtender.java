@@ -266,19 +266,21 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 		}
 		else if(methodS.equals("serialize_php"))
 		{
-			// format attempted login=name1=param1;name2=param2
-			String enums[] = value.split(";");
-			String retour = "a:"+(enums.length)+":{";
-			for(int i=0;i<enums.length;i++)
+			if(value.indexOf(";") > -1)
 			{
-				String name = enums[i].split("=")[0];
-				String val = enums[i].split("=")[1];
-				retour = retour +"s:"+name.length()+":\""+name+"\";s:"+val.length()+":\""+val+"\";";
-
+				String enums[] = value.split(";");
+				String retour = "a:"+(enums.length)+":{";
+				for(int i=0;i<enums.length;i++)
+				{
+					String name = enums[i].split("=")[0];
+					String val = enums[i].split("=")[1];
+					retour = retour +"s:"+name.length()+":\""+name+"\";s:"+val.length()+":\""+val+"\";";
+				}
+				retour = retour +"}";
+				return (new String(helpers.base64Encode(retour.getBytes())));
 			}
-			retour = retour +"}";
-
-			return (new String(helpers.base64Encode(retour.getBytes())));
+			log("[serialize_php] format error, expected one : login=name1=param1;name2=param2");
+			return value;
 		}
 		else
 			return value;
