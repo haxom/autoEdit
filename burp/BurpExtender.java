@@ -279,7 +279,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 				retour = retour +"}";
 				return (new String(helpers.base64Encode(retour.getBytes())));
 			}
-			log("[serialize_php] format error, expected one : login=name1=param1;name2=param2");
+			log("[serialize_php] format error, expected one : login=name1=param1;name2=param2;");
 			return value;
 		}
 		else
