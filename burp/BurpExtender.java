@@ -222,7 +222,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 						IParameter newParameter = helpers.buildParameter(cur.getName(), newValue, cur.getType());
 						byte[] newRequest = helpers.updateParameter(messageInfo.getRequest(), newParameter);
 						messageInfo.setRequest(newRequest);
-						log("  >> "+cur.getName()+":"+cur.getValue()+" -> "+cur.getName()+":"+newValue);
+						log("[out] "+cur.getName()+":"+cur.getValue()+" -> "+cur.getName()+":"+newValue);
 					}
 				}
 				log("");
@@ -277,6 +277,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 					retour = retour +"s:"+name.length()+":\""+name+"\";s:"+val.length()+":\""+val+"\";";
 				}
 				retour = retour +"}";
+				log("[serialize_php] payload before base64_encode : "+retour);
 				return (new String(helpers.base64Encode(retour.getBytes())));
 			}
 			log("[serialize_php] format error, expected one : login=name1=param1;name2=param2;");
