@@ -113,7 +113,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 					"double_url_encode",
 					"double_url_decode",
 					"strange",
-					"serialize_php"
+					"serialize_php",
+					"serialize_php_b64"
 
 				};
 				methodBox = new JComboBox(methods);
@@ -278,9 +279,28 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 				}
 				retour = retour +"}";
 				log("[serialize_php] payload before base64_encode : "+retour);
-				return (new String(helpers.base64Encode(retour.getBytes())));
+				return retour;
 			}
 			log("[serialize_php] format error, expected one : login=name1=param1;name2=param2;");
+			return value;
+		}
+		else if(methodS.equals("serialize_php_b64"))
+		{
+			if(value.indexOf(";") > -1)
+			{
+				String enums[] = value.split(";");
+				String retour = "a:"+(enums.length)+":{";
+				for(int i=0;i<enums.length;i++)
+				{
+					String name = enums[i].split("=")[0];
+					String val = enums[i].split("=")[1];
+					retour = retour +"s:"+name.length()+":\""+name+"\";s:"+val.length()+":\""+val+"\";";
+				}
+				retour = retour +"}";
+				log("[serialize_php_b64] payload before base64_encode : "+retour);
+				return (new String(helpers.base64Encode(retour.getBytes())));
+			}
+			log("[serialize_php_b64] format error, expected one : login=name1=param1;name2=param2;");
 			return value;
 		}
 		else
