@@ -281,7 +281,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 				log("[serialize_php] payload before base64_encode : "+retour);
 				return retour;
 			}
-			log("[serialize_php] format error, expected one : login=name1=param1;name2=param2;");
 			return value;
 		}
 		else if(methodS.equals("serialize_php_b64"))
