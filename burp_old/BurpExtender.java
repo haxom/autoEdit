@@ -162,7 +162,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 				paramsListModel.addElement(paramTextField.getText());
 				paramTextField.setText("");
 			}
-			ParamM current = new ParamM(paramTextField.getText(), "method");
+			ParamM current = new Param_M(paramTextField.getText(), "method");
 			paramsListModel.addElement(current);
 		}
 		if(e.getActionCommand().equals("del_param"))
