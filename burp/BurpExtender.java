@@ -84,10 +84,25 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 					JPanel eastNPanel = new JPanel();
 					eastNPanel.setLayout(new FlowLayout());
 					paramTextField = new JTextField(10);
+					String[] methods =
+					{
+						"base64_encode",
+						"base64_decode",
+						"url_encode",
+						"url_decode",
+						"double_url_encode",
+						"double_url_decode",
+						"strange",
+						"serialize_php",
+						"serialize_php_b64"
+					};
+					methodBox = new JComboBox(methods);
+					methodBox.setSelectedIndex(0);
 					JButton addParamButton = new JButton("add");
 					addParamButton.setActionCommand("add_param");
 					addParamButton.addActionListener(BurpExtender.this);
 					eastNPanel.add(paramTextField);
+					eastNPanel.add(methodBox);
 					eastNPanel.add(addParamButton);
 				paramsListModel = new DefaultListModel();
 				paramsList = new JList(paramsListModel);
@@ -104,26 +119,10 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 					dellAllParamsButton.addActionListener(BurpExtender.this);
 					eastSPanel.add(delParamButton);
 					eastSPanel.add(dellAllParamsButton);
-				String[] methods =
-				{
-					"base64_encode",
-					"base64_decode",
-					"url_encode",
-					"url_decode",
-					"double_url_encode",
-					"double_url_decode",
-					"strange",
-					"serialize_php",
-					"serialize_php_b64"
-
-				};
-				methodBox = new JComboBox(methods);
-				methodBox.setSelectedIndex(0);
 				eastPanel.add(new JLabel("- Parameters -"));
 				eastPanel.add(eastNPanel);
 				eastPanel.add(new JScrollPane(paramsList));
 				eastPanel.add(eastSPanel);
-				eastPanel.add(methodBox);
 
 				// Center
 				logTextArea = new JTextArea();
@@ -157,13 +156,29 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 	{
 		if(e.getActionCommand().equals("add_param"))
 		{
-			if(!paramsListModel.contains(paramTextField.getText()))
+			String paramName = paramTextField.getText();
+			boolean isIn = false; int i = 0;
+			for(;i<paramsListModel.getSize();i++)
 			{
-				paramsListModel.addElement(paramTextField.getText());
-				paramTextField.setText("");
+				ParamM current = (ParamM)paramsListModel.getElementAt(i);
+				if(current.getParamName().equals(paramName))
+				{
+					isIn = true;
+					break;
+				}
 			}
-			ParamM current = new ParamM(paramTextField.getText(), "method");
-			paramsListModel.addElement(current);
+
+			if(!paramName.equals("") && !isIn)
+			{
+				ParamM current = new ParamM(paramName, (String)methodBox.getSelectedItem());
+				paramsListModel.addElement(current);
+			}else if(!paramName.equals("") && isIn)
+			{
+				ParamM current = (ParamM)paramsListModel.getElementAt(i);
+				current.setMethod((String)methodBox.getSelectedItem());
+			}
+			paramsList.updateUI();
+			paramTextField.setText("");
 		}
 		if(e.getActionCommand().equals("del_param"))
 		{
@@ -218,14 +233,18 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 				for(int i=0;i<listParams.size();i++)
 				{
 					IParameter cur = listParams.get(i);
-					if(paramsListModel.contains(cur.getName()))
+					for(int v=0;v<paramsListModel.getSize(); v++)
 					{
-						// Current param OK
-						String newValue = calNewValue(cur.getValue());
-						IParameter newParameter = helpers.buildParameter(cur.getName(), newValue, cur.getType());
-						byte[] newRequest = helpers.updateParameter(messageInfo.getRequest(), newParameter);
-						messageInfo.setRequest(newRequest);
-						log("[out] "+cur.getName()+":"+cur.getValue()+" -> "+cur.getName()+":"+newValue);
+						ParamM current = (ParamM)paramsListModel.getElementAt(v);
+						if(current.getParamName().equals(cur.getName()))
+						{
+							// Current param OK
+							String newValue = calNewValue(cur.getValue(), (ParamM)paramsListModel.getElementAt(v));
+							IParameter newParameter = helpers.buildParameter(cur.getName(), newValue, cur.getType());
+							byte[] newRequest = helpers.updateParameter(messageInfo.getRequest(), newParameter);
+							messageInfo.setRequest(newRequest);
+							log("[out] "+cur.getName()+":"+cur.getValue()+" -> "+cur.getName()+":"+newValue);
+						}
 					}
 				}
 				log("");
@@ -234,22 +253,22 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 	}
 
 	// Next, some functions not overriden
-	public String calNewValue(String value)
+	public String calNewValue(String value, ParamM param)
 	{
-		String methodS = (String)methodBox.getSelectedItem();
-		if(methodS.equals("base64_encode"))
+		String method = param.getMethod();
+		if(method.equals("base64_encode"))
 			return (new String(helpers.base64Encode(value.getBytes())));
-		else if(methodS.equals("base64_decode"))
+		else if(method.equals("base64_decode"))
 			return (new String(helpers.base64Decode(value.getBytes())));
-		else if(methodS.equals("url_encode"))
+		else if(method.equals("url_encode"))
 			return helpers.urlEncode(value);
-		else if(methodS.equals("url_decode"))
+		else if(method.equals("url_decode"))
 			return helpers.urlDecode(value);
-		else if(methodS.equals("double_url_encode"))
+		else if(method.equals("double_url_encode"))
 			return helpers.urlEncode(helpers.urlEncode(value));
-		else if(methodS.equals("double_url_decode"))
+		else if(method.equals("double_url_decode"))
 			return helpers.urlDecode(helpers.urlDecode(value));
-		else if(methodS.equals("strange"))
+		else if(method.equals("strange"))
 		{
 			String result = "";
 			value = helpers.urlDecode(new String(value.getBytes()));
@@ -267,7 +286,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 			result = helpers.base64Encode(result.getBytes());
 			return result;
 		}
-		else if(methodS.equals("serialize_php"))
+		else if(method.equals("serialize_php"))
 		{
 			if(value.indexOf(";") > -1)
 			{
@@ -285,7 +304,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 			}
 			return value;
 		}
-		else if(methodS.equals("serialize_php_b64"))
+		else if(method.equals("serialize_php_b64"))
 		{
 			if(value.indexOf(";") > -1)
 			{
@@ -338,8 +357,13 @@ class ParamM
 		return this.method;
 	}
 
+	public void setMethod(String method)
+	{
+		this.method = method;
+	}
+
 	public String toString()
 	{
-		return param_name+" ("+method+")";
+		return param_name+" -> "+method;
 	}
 }
