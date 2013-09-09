@@ -27,7 +27,6 @@ Adding methods :
 Features :
 - multi-methods selection
 - user-defined methods
-- method / param
 
 Compilation
 ===========
@@ -35,8 +34,10 @@ Compilation
 $ chmod +x make.sh
 $ ./make.sh
 added manifest
-adding: burp/BurpExtender$1.class(in = 4320) (out= 2064)(deflated 52%)
-adding: burp/BurpExtender.class(in = 7295) (out= 3197)(deflated 56%)
+ajout : burp/BurpExtender$1.class(entrée = 4475) (sortie = 2168)(compression : 51 %)
+ajout : burp/BurpExtender.class(entrée = 9471) (sortie = 4260)(compression : 55 %)
+ajout : burp/BurpExtender.java(entrée = 10960) (sortie = 2878)(compression : 73 %)
+ajout : burp/ParamM.class(entrée = 776) (sortie = 434)(compression : 44 %)
 
 Usage
 =====
