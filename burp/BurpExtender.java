@@ -20,6 +20,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.BoxLayout;
 import javax.swing.ListSelectionModel;
+import javax.swing.JOptionPane;
 // Util
 import java.util.List;
 import java.util.regex.Matcher;
@@ -94,7 +95,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 						"double_url_decode",
 						"strange",
 						"serialize_php",
-						"serialize_php_b64"
+						"serialize_php_b64",
+						"xor"
 					};
 					methodBox = new JComboBox(methods);
 					methodBox.setSelectedIndex(0);
@@ -170,12 +172,34 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 
 			if(!paramName.equals("") && !isIn)
 			{
-				ParamM current = new ParamM(paramName, (String)methodBox.getSelectedItem());
+				// new one, create new ParamM
+				String methodS = (String)methodBox.getSelectedItem();
+				ParamM current;
+				if(methodS.equals("xor"))
+				{
+					String valueS = (String)JOptionPane.showInputDialog("Key for XOR :", "");
+					current = new ParamM(paramName, methodS, valueS);
+				}
+				else
+				{
+					current = new ParamM(paramName, methodS);
+				}
 				paramsListModel.addElement(current);
 			}else if(!paramName.equals("") && isIn)
 			{
+				// existing, just update the method and param
+				String methodS = (String)methodBox.getSelectedItem();
 				ParamM current = (ParamM)paramsListModel.getElementAt(i);
-				current.setMethod((String)methodBox.getSelectedItem());
+				if(methodS.equals("xor"))
+				{
+					String valueS = (String)JOptionPane.showInputDialog("Key for XOR :", "");
+					current.setMethod(methodS);
+					current.setValue(valueS);
+				}
+				else
+				{
+					current.setMethod(methodS);
+				}
 			}
 			paramsList.updateUI();
 			paramTextField.setText("");
@@ -323,6 +347,14 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 			log("[serialize_php_b64] format error, expected one : login=name1=param1;name2=param2;");
 			return value;
 		}
+		else if(method.equals("xor"))
+		{
+			StringBuilder sb = new StringBuilder();
+			String key = param.getValue();
+			for(int i=0;i<value.length();i++)
+				sb.append((char)(value.charAt(i) ^ key.charAt(i % key.length())));
+			return sb.toString();
+		}
 		else
 			return value;
 	}
@@ -337,14 +369,22 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, ActionL
 
 class ParamM
 {
-	public String value;
+	private String value;
 	private String param_name;
 	private String method;
+
+	public ParamM(String param_name, String method, String value)
+	{
+		this.param_name = param_name;
+		this.method = method;
+		this.value = value;
+	}
 
 	public ParamM(String param_name, String method)
 	{
 		this.param_name = param_name;
 		this.method = method;
+		this.value = "";
 	}
 
 	public String getParamName()
@@ -362,8 +402,20 @@ class ParamM
 		this.method = method;
 	}
 
+	public void setValue(String value)
+	{
+		this.value = value;
+	}
+
+	public String getValue(){
+		return this.value;
+	}
+
 	public String toString()
 	{
-		return param_name+" -> "+method;
+		if(this.value.equals(""))
+			return param_name+" -> "+method;
+		else
+			return this.param_name+" -> "+this.method+" ("+this.value+")";
 	}
 }
