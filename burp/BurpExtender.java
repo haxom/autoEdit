@@ -382,9 +382,7 @@ class ParamM
 
 	public ParamM(String param_name, String method)
 	{
-		this.param_name = param_name;
-		this.method = method;
-		this.value = "";
+		this(param_name, method, "");
 	}
 
 	public String getParamName()
