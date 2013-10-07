@@ -3,6 +3,7 @@ autoEdit
 
 Extender for Burp Suite <http://portswigger.net/burp/> (only for Pro version).
 This extention permits to edit automatically specific parameters with a pre-defined method.
+
 Supported methods :
 - base64 encode/decode
 - url (simple & double) encode/decode
@@ -12,9 +13,11 @@ Supported methods :
 - serialize_php_b64
 	form expected : param=name1=value1;name2=value2;...
 	-> param=base64_encode(a:2:{s:5:"name1";s:6:"value1";s:5:"name2";s:6:"value2";})
+- XOR
 
--- Burp Extender API (all Java files, except BurpExtender.java) :  <http://portswigger.net/burp/extender/api/burp_extender_api.zip>
--- JavaDoc for Bur Extender API : <http://portswigger.net/burp/extender/api/index.html>
+-- Buro Externder
+API download : <http://portswigger.net/burp/extender/api/burp_extender_api.zip>
+Java Doc : <http://portswigger.net/burp/extender/api/index.html>
 
 ToDo
 ====
@@ -32,11 +35,7 @@ Compilation
 
 $ chmod +x make.sh
 $ ./make.sh
-added manifest
-ajout : burp/BurpExtender$1.class(entrée = 4475) (sortie = 2168)(compression : 51 %)
-ajout : burp/BurpExtender.class(entrée = 9471) (sortie = 4260)(compression : 55 %)
-ajout : burp/BurpExtender.java(entrée = 10960) (sortie = 2878)(compression : 73 %)
-ajout : burp/ParamM.class(entrée = 776) (sortie = 434)(compression : 44 %)
+[...]
 
 Usage
 =====
